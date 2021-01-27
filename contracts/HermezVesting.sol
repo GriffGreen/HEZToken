@@ -11,7 +11,7 @@ contract HermezVesting {
     address public distributor;
 
     mapping(address => uint256) public vestedTokens;
-    mapping(address => uint256) public withdrawed;
+    mapping(address => uint256) public withdrawn;
     uint256 public totalVestedTokens;
 
     uint256 public startTime;
@@ -91,7 +91,7 @@ contract HermezVesting {
         uint256 unlockedAmount = totalTokensUnlockedAt(timestamp)
             .mul(vestedTokens[recipient])
             .div(totalVestedTokens);
-        return unlockedAmount.sub(withdrawed[recipient]);
+        return unlockedAmount.sub(withdrawn[recipient]);
     }
 
     function withdraw() external {
@@ -105,7 +105,7 @@ contract HermezVesting {
             getTimestamp()
         );
 
-        withdrawed[msg.sender] = withdrawed[msg.sender].add(
+        withdrawn[msg.sender] = withdrawn[msg.sender].add(
             remainingToWithdraw
         );
 
@@ -137,8 +137,8 @@ contract HermezVesting {
             "HermezVesting::changeAddress: ADDRESS_HAS_BALANCE"
         );
         require(
-            withdrawed[newAddress] == 0,
-            "HermezVesting::changeAddress: ADDRESS_ALREADY_WITHDRAWED"
+            withdrawn[newAddress] == 0,
+            "HermezVesting::changeAddress: ADDRESS_ALREADY_WITHDRAWN"
         );
         require(
             newAddress != distributor,
@@ -147,8 +147,8 @@ contract HermezVesting {
 
         vestedTokens[newAddress] = vestedTokens[msg.sender];
         vestedTokens[msg.sender] = 0;
-        withdrawed[newAddress] = withdrawed[msg.sender];
-        withdrawed[msg.sender] = 0;
+        withdrawn[newAddress] = withdrawn[msg.sender];
+        withdrawn[msg.sender] = 0;
 
         if (msg.sender == distributor) {
             distributor = newAddress;
